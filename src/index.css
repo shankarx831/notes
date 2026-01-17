@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root { height: 100%; }
+
+/* --- 1. APP STYLES --- */
+.concept-title {
+  @apply font-bold text-lg mb-2 flex items-center gap-2 text-blue-600 dark:text-blue-400;
+}
+.key-point {
+  @apply font-semibold text-gray-900 dark:text-gray-100;
+}
+
+/* --- 2. VIEW TRANSITION API OVERRIDES --- */
+/* This is crucial for the "Circle Wipe" animation to work smoothly */
+
+/* Disable the default cross-fade so our JS animation is visible */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* Ensure the 'new' view sits on top so the circle reveals it */
+::view-transition-new(root) {
+  z-index: 9999;
+}
+
+/* Apply smooth color transitions to the body content */
+@layer base {
+  body {
+    @apply transition-colors duration-300 ease-in-out;
+  }
+}
+
+/* --- 3. PDF MODE OVERRIDES --- */
+/* These rules only apply when generating PDFs to force "Ink Saver" mode */
+
+.pdf-mode { @apply bg-white !important; }
+
+.pdf-mode * { 
+  @apply text-black border-gray-300 !important; 
+  text-shadow: none !important; 
+  box-shadow: none !important; 
+  background-color: transparent !important;
+}
+
+/* Header/Gradient Fixes for PDF (White box with border) */
+.pdf-mode .bg-gradient-to-r,
+.pdf-mode [class*="bg-gradient-"] {
+  background: #ffffff !important;
+  border: 2px solid #000000 !important;
+  border-radius: 12px !important;
+  color: #000000 !important;
+}
+
+/* Hiding Elements (Buttons, Nav) */
+.pdf-mode .pdf-hide { display: none !important; }
+
+/* SHOWING Elements (For PDF Only - like the GitHub link) */
+.pdf-only { display: none !important; } /* Hidden by default on screen */
+.pdf-mode .pdf-only { display: block !important; } /* Visible only in PDF */
+
+/* Code Block Fixes for Print */
+.pdf-mode .code-block-container { 
+  background-color: #ffffff !important; 
+  border: 1px solid #000000 !important; 
+  margin: 10px 0 !important; 
+}
+.pdf-mode .code-block-header { 
+  background-color: #f3f4f6 !important; 
+  border-bottom: 1px solid #000000 !important; 
+}
+.pdf-mode pre, 
+.pdf-mode code, 
+.pdf-mode span { 
+  color: #000000 !important; 
+  background: transparent !important; 
+}

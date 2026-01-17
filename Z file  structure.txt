@@ -1,0 +1,30 @@
+exam-notes/
+├── public/
+├── src/
+│   ├── components/
+│   │   ├── DownloadPdfButton.jsx  <-- PDF Logic
+│   │   ├── Layout.jsx             <-- Wrapper for Sidebar + Content
+│   │   ├── Sidebar.jsx            <-- Auto-generated Menu
+│   │   └── Question.jsx           <-- Reusable UI for Q&A style
+│   ├── pages/
+│   │   ├── it/                    <-- Department
+│   │   │   ├── year2/             <-- Year
+│   │   │   │   ├── networks/      <-- Subject
+│   │   │   │   │   ├── SectionA.jsx  <-- The Note File
+│   │   │   │   │   └── SectionB.jsx
+│   │   │   │   ├── ecommerce/
+│   │   │   │       └── Unit1.jsx
+│   │   ├── cs/
+│   │   │   ├── year1/
+│   │   │   │   ├── c-programming/
+│   │   │   │       └── PartA_Basics.jsx
+│   ├── utils/
+│   │   ├── notesLoader.js         <-- The magic script (scans folders)
+│   │   └── pdfExporter.js         <-- HTML2Canvas logic
+│   ├── index.css                  <-- Tailwind imports
+│   ├── main.jsx                   <-- Entry point
+│   └── router.jsx                 <-- Route generator
+├── index.html
+├── package.json
+├── tailwind.config.js
+└── vite.config.js
