@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Collapsible from '../components/Collapsible';
+import Footer from '../components/Footer';
 
 // --- Icon Components for cleaner code ---
 
@@ -165,6 +166,7 @@ const Home = ({ tree }) => {
           </div>
         ))}
       </div>
+      <Footer />
     </div>
   );
 };
