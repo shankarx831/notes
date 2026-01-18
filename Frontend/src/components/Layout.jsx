@@ -40,9 +40,9 @@ const Layout = ({ tree }) => {
 
   const findCurrentComponent = () => {
     const parts = location.pathname.split('/').filter(Boolean);
-    // Dynamic paths are /notes/dept/year/sec/subj/id (6 parts)
-    if (parts.length !== 6) return null;
-    const [notesPrefix, dept, year, sec, subj, id] = parts;
+    // Dynamic paths are /dept/year/sec/subj/id (5 parts)
+    if (parts.length !== 5) return null;
+    const [dept, year, sec, subj, id] = parts;
     try {
       const note = tree[dept][year][sec][subj].find(n => n.id === id);
       return note ? { ...note, dept, year, sec, subj } : null;
@@ -78,7 +78,7 @@ const Layout = ({ tree }) => {
     }, 4000);
   };
 
-  const isNotePage = location.pathname.split('/').filter(Boolean).length === 6;
+  const isNotePage = location.pathname.split('/').filter(Boolean).length === 5;
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white overflow-hidden">
