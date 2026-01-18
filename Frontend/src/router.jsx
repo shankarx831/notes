@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { createBrowserRouter, Navigate, useNavigate } from 'react-router-dom';
+import { createHashRouter, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import Layout from './components/Layout';
 import Home from './pages/Home';
@@ -317,7 +317,7 @@ export function generateRoutes(tree) {
   });
 
   // Return the Router Configuration
-  return createBrowserRouter([
+  return createHashRouter([
     {
       path: '/',
       element: <Layout tree={tree} />,
@@ -336,5 +336,5 @@ export function generateRoutes(tree) {
         { path: '*', element: <Navigate to="/" /> }
       ]
     }
-  ], { basename: '/notes' });
+  ]);
 }
