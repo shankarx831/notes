@@ -35,13 +35,13 @@ const PageWrapper = ({ noteData, dept, year, section, subj }) => {
   const { user, token } = useAuth(); // Get Auth Context
 
   // Extract headers for ToC
-  const headers = content?.split(/^##\s+/m).slice(1).map((section, index) => {
+  const headers = typeof content === 'string' ? content.split(/^##\s+/m).slice(1).map((section, index) => {
     const titleLine = section.split('\n')[0];
     const match = titleLine.match(/^(\d+)\.?\s*(.*)/);
     const title = match ? match[2] : titleLine;
     const id = title.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
     return { title, id, num: match ? match[1] : (index + 1).toString() };
-  }) || [];
+  }) : [];
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deleteReason, setDeleteReason] = useState('');
@@ -192,9 +192,6 @@ const PageWrapper = ({ noteData, dept, year, section, subj }) => {
                 </div>
                 <div>
                   <p className="font-extrabold text-lg tracking-tight">{displayUploaderName}</p>
-                  <p className="opacity-60 text-xs font-bold uppercase tracking-widest">
-                    {displayUploaderEmail} • {noteData.createdAt ? new Date(noteData.createdAt).toLocaleDateString() : 'Original Base'}
-                  </p>
                 </div>
               </div>
             </div>
