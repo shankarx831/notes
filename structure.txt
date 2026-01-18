@@ -1,0 +1,19 @@
+exam-notes/
+├── Backend/                 # Spring Boot Maven Project
+│   ├── src/main/java/com/studentnotes/
+│   │   ├── config/          # Security & JWT Filters
+│   │   ├── controller/      # API Endpoints (Admin, Teacher, Public)
+│   │   ├── model/           # JPA Entities (User, Note, etc.)
+│   │   ├── repository/      # Database Access (SQL)
+│   │   └── util/            # Helper classes (JWT)
+│   └── pom.xml              # Maven Dependencies
+├── Frontend/                # React Vite Project
+│   ├── src/
+│   │   ├── components/      # UI Components (Markdown, Layout, etc.)
+│   │   ├── context/         # AuthContext for JWT
+│   │   ├── pages/           # Page Components (Home, Dashboards)
+│   │   ├── router.jsx       # Dynamic Routes & Note Wrapper
+│   │   └── main.jsx         # Entry Point
+│   ├── index.css            # Global Tailwind Styles
+│   └── package.json         # React Dependencies
+└── README.md                # Project Documentation

@@ -1,0 +1,193 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=JetBrains+Mono:wght@400;700&display=swap');
+
+:root {
+  --primary: #2563eb;
+  --secondary: #6366f1;
+  --accent: #f59e0b;
+  --bg-light: #f8fafc;
+  --bg-dark: #0f172a;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply transition-colors duration-500 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen;
+    font-family: 'Outfit', sans-serif;
+  }
+
+  code,
+  pre,
+  .font-mono {
+    font-family: 'JetBrains Mono', monospace !important;
+  }
+}
+
+/* --- 3. KATEX FIX (Tailwind Conflict Resolver) --- */
+/* 
+ * The KEY insight: Don't override font-family! 
+ * KaTeX uses multiple specialized fonts (Main, Math, Size1-4, AMS)
+ * and selects them per-character. Overriding breaks this mechanism.
+ * We ONLY fix Tailwind's aggressive resets.
+ */
+
+/* Stop Tailwind from breaking KaTeX layout */
+.katex,
+.katex * {
+  border-style: none !important;
+  /* Tailwind adds borders */
+  box-sizing: content-box !important;
+  /* KaTeX needs content-box */
+  line-height: normal !important;
+  /* Tailwind normalizes line-height */
+  text-rendering: auto !important;
+  letter-spacing: normal !important;
+  word-spacing: normal !important;
+  text-indent: 0 !important;
+}
+
+/* Restore borders ONLY where KaTeX needs them */
+.katex .frac-line,
+.katex .sqrt-line,
+.katex .overline-line,
+.katex .underline-line,
+.katex .hline {
+  border-bottom-style: solid !important;
+  border-bottom-width: 0.04em !important;
+  border-color: currentColor !important;
+}
+
+/* Ensure KaTeX display mode has proper spacing and high-fidelity appearance */
+.katex-display {
+  @apply my-10 py-6 px-10 rounded-3xl bg-slate-100/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 transition-all overflow-x-auto;
+  display: block !important;
+  text-align: center !important;
+}
+
+/* Dark Mode: Ensure visibility */
+.dark .katex {
+  color: #f1f5f9 !important;
+}
+
+/* --- 4. PDF MODE (Ink Saver & Watermarks) --- */
+
+.pdf-mode {
+  @apply bg-white !important;
+}
+
+.pdf-mode * {
+  @apply text-black border-gray-300 !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+}
+
+/* Force math to black in PDF */
+.pdf-mode .katex {
+  color: black !important;
+}
+
+/* Transform Blue Banners to Professional Outlined Boxes for Print */
+.pdf-mode .bg-gradient-to-br,
+.pdf-mode .bg-gradient-to-r,
+.pdf-mode [class*="bg-gradient-"] {
+  background: #ffffff !important;
+  border: 2px solid #000000 !important;
+  border-radius: 12px !important;
+  color: #000000 !important;
+}
+
+/* Control Visibility */
+.pdf-mode .pdf-hide {
+  display: none !important;
+}
+
+.pdf-only {
+  display: none !important;
+}
+
+.pdf-mode .pdf-only {
+  display: block !important;
+}
+
+/* Printer-Friendly Code Blocks */
+.pdf-mode .code-block-container {
+  background-color: #ffffff !important;
+  border: 1px solid #000000 !important;
+}
+
+.pdf-mode .code-block-header {
+  background-color: #f3f4f6 !important;
+  border-bottom: 1px solid #000000 !important;
+}
+
+.pdf-mode pre,
+.pdf-mode code,
+.pdf-mode span {
+  color: #000000 !important;
+  background: transparent !important;
+}
+
+/* Clean up spacing for Markdown rendering */
+.prose :first-child {
+  margin-top: 0 !important;
+}
+
+.prose :last-child {
+  margin-bottom: 0 !important;
+}
+
+/* --- SCIENTIFIC PROSE & UI REFINEMENT --- */
+.prose-scientific {
+  @apply leading-relaxed text-slate-700 dark:text-slate-300;
+  font-size: 1.05rem;
+}
+
+.prose-scientific h2 {
+  @apply text-2xl font-black text-slate-900 dark:text-white mt-12 mb-6 tracking-tight flex items-center gap-3;
+}
+
+.prose-scientific h2::before {
+  content: '';
+  @apply w-1 h-8 bg-blue-600 rounded-full inline-block;
+}
+
+.prose-scientific p {
+  @apply mb-6 leading-8;
+}
+
+.glass-panel {
+  @apply backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-2xl;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+}
+
+.dark .glass-panel {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.6));
+}
+
+.hover-lift {
+  @apply transition-all duration-300 ease-out cursor-pointer;
+}
+
+.hover-lift:hover {
+  @apply -translate-y-1 shadow-2xl shadow-blue-500/10;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-300 dark:bg-slate-700 rounded-full hover:bg-slate-400 dark:hover:bg-slate-600 transition-colors;
+}

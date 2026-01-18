@@ -1,0 +1,329 @@
+You are a senior full-stack architect with strong experience in React, Vite, Tailwind CSS, Spring Boot, PostgreSQL, and hybrid static–dynamic architectures.
+
+I have already built a static React + Vite exam-notes website with:
+- Filesystem-based navigation
+- Dynamic hierarchy (Department → Year → Subject → Notes)
+- Auto routing using import.meta.glob
+- Mobile-first Tailwind UI
+- Client-side PDF export
+
+Now I want to **upgrade this project into a HYBRID architecture** that works BOTH:
+1. With Spring Boot + PostgreSQL running
+2. Without Spring Boot (pure static fallback)
+
+---
+
+## 🎯 GOAL
+
+Build a **hybrid notes platform** where:
+- The frontend always works (even if backend is down)
+- When backend is running, data comes from DB
+- When backend is down, frontend shows committed static files
+- Role-based access control exists
+- Admin approval workflow exists for deletion
+
+---
+
+## 🧱 OVERALL ARCHITECTURE
+
+### Frontend
+- React + Vite
+- Tailwind CSS
+- Runs independently
+- Can work as:
+  - Static site (GitHub Pages / CDN)
+  - Dynamic site (connected to Spring Boot API)
+
+### Backend
+- Spring Boot JAR
+- PostgreSQL database
+- REST APIs
+- JWT-based authentication
+- File metadata stored in DB
+- Actual note content stored either:
+  - As Markdown / HTML / JSON in DB
+  - Or as files referenced by DB
+
+---
+
+## 👥 USER ROLES
+
+### 1️⃣ STUDENT (NO LOGIN)
+- Public user
+- Can:
+  - Browse departments, years, subjects
+  - View notes
+  - Download notes as PDF
+- Cannot:
+  - Upload
+  - Delete
+  - Modify anything
+
+---
+
+### 2️⃣ TEACHER (LOGIN REQUIRED)
+- Authenticated user
+- Permissions:
+  - Upload notes(md or jsx) ONLY to assigned folders
+    - Assigned Department(s)
+    - Assigned Year(s)
+    - Assigned Subject(s)
+  - Request deletion of their own uploaded notes
+- Deletion behavior:
+  - Teacher CANNOT delete directly
+  - Teacher raises a **Deletion Request Ticket**
+  - Ticket includes:
+    - Note ID
+    - Reason for deletion
+    - Timestamp
+- Teacher can:
+  - View status of their deletion requests (Pending / Approved / Rejected)
+
+---
+
+### 3️⃣ ADMIN (ME)
+- Full control
+- Can:
+  - Delete ANY note instantly
+  - Approve or reject teacher deletion requests
+  - Add new teacher users
+  - Assign:
+    - Name
+    - Phone number
+    - Email
+    - Accessible Department(s) / Year(s) / Subject(s)
+  - Enable / disable teacher accounts
+- Admin UI:
+  - Dashboard
+  - User management
+  - Deletion request approval panel
+
+---
+
+## 🔁 HYBRID DATA LOADING BEHAVIOR (VERY IMPORTANT)
+
+### Frontend must behave as follows:
+
+1. On app startup:
+   - Ping backend health endpoint `/api/health`
+2. If backend is AVAILABLE:
+   - Fetch departments, years, subjects, notes from API
+   - Render UI using API data
+3. If backend is NOT AVAILABLE:
+   - Fallback to:
+     - Local filesystem notes (import.meta.glob)
+     - Committed JSX / MD files inside `/src/pages`
+4. UI should NOT break in either case
+
+### This means:
+- Backend is OPTIONAL
+- Frontend must gracefully degrade
+
+---
+
+## 🗂 DATA SOURCES
+
+### Static Mode (Backend OFF)
+- Notes loaded via:
+  - `import.meta.glob('../pages/**/*.jsx')`
+- Navigation built from folder structure
+- Read-only mode
+- No login UI visible
+
+---
+
+### Dynamic Mode (Backend ON)
+- Notes fetched from REST API:
+  - `/api/departments`
+  - `/api/notes`
+- Metadata stored in PostgreSQL
+- Content rendered dynamically
+- Login UI visible
+
+---
+
+## 🔐 AUTHENTICATION & SECURITY
+
+- Backend uses:
+  - Spring Security
+  - JWT tokens
+- Login endpoints:
+  - `/api/auth/login`
+- Frontend:
+  - Stores JWT in memory or secure storage
+  - Role-based route protection
+- Roles:
+  - `ROLE_STUDENT`
+  - `ROLE_TEACHER`
+  - `ROLE_ADMIN`
+
+---
+
+## 🧾 DATABASE DESIGN (POSTGRESQL)
+
+### Tables (High-level)
+
+- users
+  - id
+  - name
+  - email
+  - phone
+  - role
+  - enabled
+
+- permissions
+  - user_id
+  - department
+  - year
+  - subject
+
+- notes
+  - id
+  - title
+  - department
+  - year
+  - subject
+  - content
+  - created_by
+  - created_at
+
+- deletion_requests
+  - id
+  - note_id
+  - requested_by
+  - reason
+  - status (PENDING / APPROVED / REJECTED)
+  - reviewed_by
+  - reviewed_at
+
+---
+
+## 🧠 FRONTEND STATE STRATEGY
+
+- Central data provider:
+  - Detect backend availability
+  - Decide data source (API vs static)
+- Unified data format:
+  - Static and API data must map to same shape
+- Feature toggles:
+  - Upload UI visible only if logged in
+  - Admin UI visible only for admin
+
+---
+
+## 📱 UI REQUIREMENTS
+
+- Mobile-first
+- Tailwind CSS only
+- Responsive sidebar
+- Admin dashboard layout
+- Teacher upload form
+- Deletion request modal
+- Status badges
+
+---
+
+## 📦 DEPLOYMENT MODES
+
+### Mode 1: STATIC ONLY
+- React built
+- Deployed on GitHub Pages
+- No backend
+- Student-only experience
+
+### Mode 2: FULL STACK
+- React frontend
+- Spring Boot JAR running
+- PostgreSQL running
+- Full role-based system enabled
+
+---
+
+## 🧩 INCLUDE IN OUTPUT
+
+1. High-level architecture diagram (textual)
+2. Spring Boot:
+   - Entity models
+   - REST controllers
+   - Security config
+   - JWT flow
+3. Frontend:
+   - Hybrid data loader
+   - Auth context
+   - Role-based routing
+4. Deletion approval workflow
+5. Fallback logic pseudocode
+6. Clear explanation of how frontend works WITH and WITHOUT backend
+
+---
+
+## 🚫 IMPORTANT CONSTRAINTS
+
+- Frontend MUST NOT crash if backend is down
+- Backend must be optional
+- Static files must remain usable forever
+- Clear separation of concerns
+- Clean, production-grade architecture
+
+
+exam-notes/
+├── backend/                         <-- OPTIONAL (can be off)
+│   ├── src/main/java/com/studentnotes/
+│   │   ├── config/
+│   │   │   ├── SecurityConfig.java
+│   │   │   └── CorsConfig.java
+│   │   ├── controller/
+│   │   │   ├── AuthController.java
+│   │   │   ├── PublicController.java     <-- tree + public notes
+│   │   │   ├── TeacherController.java    <-- upload, delete request
+│   │   │   └── AdminController.java      <-- approve, users
+│   │   ├── model/
+│   │   │   ├── User.java
+│   │   │   ├── Note.java
+│   │   │   └── DeletionRequest.java
+│   │   ├── repository/
+│   │   └── service/
+│   │       └── TreeBuilderService.java
+│   └── application.properties
+│
+├── frontend/                        <-- YOUR EXISTING EXAM NOTES
+│   ├── public/
+│   ├── src/
+│   │   ├── context/
+│   │   │   └── DataProvider.jsx    ⭐ HYBRID ENGINE (brain)
+│   │   │
+│   │   ├── components/
+│   │   │   ├── Layout.jsx
+│   │   │   ├── Sidebar.jsx
+│   │   │   ├── DownloadPdfButton.jsx
+│   │   │   ├── Question.jsx
+│   │   │   ├── AdminDashboard.jsx
+│   │   │   └── TeacherUpload.jsx
+│   │   │
+│   │   ├── pages/                  <-- STATIC NOTES (fallback)
+│   │   │   ├── it/
+│   │   │   │   ├── year2/
+│   │   │   │   │   ├── networks/
+│   │   │   │   │   │   ├── SectionA.jsx
+│   │   │   │   │   │   └── SectionB.jsx
+│   │   │   │   │   └── ecommerce/
+│   │   │   │   │       └── Unit1.jsx
+│   │   │   └── cs/
+│   │   │       └── year1/
+│   │   │           └── c-programming/
+│   │   │               └── PartA_Basics.jsx
+│   │   │
+│   │   ├── utils/
+│   │   │   ├── notesLoader.js      <-- filesystem scanner
+│   │   │   ├── api.js              <-- backend client
+│   │   │   └── pdfExporter.js
+│   │   │
+│   │   ├── router.jsx
+│   │   ├── main.jsx
+│   │   └── index.css
+│   │
+│   ├── .env
+│   ├── index.html
+│   ├── vite.config.js
+│   ├── tailwind.config.js
+│   └── package.json
