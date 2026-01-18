@@ -175,8 +175,20 @@ const PageWrapper = ({ noteData, dept, year, section, subj }) => {
         </div>
       )}
 
+      {/* --- PDF ONLY SIMPLE HEADER --- */}
+      <div className="pdf-only mb-10 pb-8 border-b-2 border-gray-100">
+        <h1 className="text-4xl font-black text-black mb-2">{meta.title}</h1>
+        <div className="flex items-center gap-4 text-xs font-bold text-gray-500 uppercase tracking-widest">
+          <span>{displayUploaderName}</span>
+          <span className="w-1 h-1 rounded-full bg-gray-300"></span>
+          <span>{dept}</span>
+          <span className="w-1 h-1 rounded-full bg-gray-300"></span>
+          <span>{subject}</span>
+        </div>
+      </div>
+
       {/* --- HEADER --- */}
-      <div className={`bg-gradient-to-br from-blue-700 to-indigo-900 p-10 md:p-16 rounded-[40px] shadow-2xl mb-12 text-white relative overflow-hidden group transition-all duration-700 ${isFocusMode ? 'scale-95 opacity-0' : 'scale-100 opacity-100'}`}>
+      <div className={`bg-gradient-to-br from-blue-700 to-indigo-900 p-10 md:p-16 rounded-[40px] shadow-2xl mb-12 text-white relative overflow-hidden group transition-all duration-700 pdf-hide ${isFocusMode ? 'scale-95 opacity-0' : 'scale-100 opacity-100'}`}>
         <div className="relative z-10">
           <Breadcrumbs dept={dept} year={year} section={section} subj={subj} />
 
