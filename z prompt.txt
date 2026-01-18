@@ -1,0 +1,69 @@
+
+
+code
+JSON
+download
+content_copy
+expand_less
+{
+  "project": "StudentNotes",
+  "creator": "Shankar",
+  "college": "SMVEC",
+  "instructions": {
+    "step_0_context": {
+      "description": "Project Architecture & Global Rules",
+      "folder_depth": "5 levels: src/pages/dept/year/section/subject/file",
+      "alias_path": "Use '@/' to represent 'src/' (e.g., '@/components/Question')",
+      "engine_behavior": {
+        "md": "Splits content at every '##' header to create a visual Question Card UI automatically.",
+        "jsx": "Requires manual wrapping of content in <Question> components."
+      },
+      "branding": "Academic resources for SMVEC students. Maintain a professional but helpful tone."
+    },
+    "step_1_generate_md": {
+      "choice_label": "Markdown Mode",
+      "rules": [
+        "Start with frontmatter: --- title: [Name] order: [Number] ---",
+        "Never use H1 (#) in the body.",
+        "Use '## [Number]. [Topic]' for every section to trigger the UI Card engine.",
+        "Use blockquotes (>) for 'Note' or 'Important' boxes.",
+        "Use standard tables for comparison data.",
+        "Code snippets must use triple backticks with the specific language."
+        "Use LaTeX for formulas: $ E=mc^2 $ for inline, $$ formula $$ for blocks.",
+        "Use Scientific Callouts: Start a blockquote with '> Important:' for warnings, or '> Formula:' for math rules.",
+        "Use '## [Number]. [Question]' for main sections.",
+        "Bold key scientific terms inside paragraphs."
+      ]
+    },
+    "step_2_generate_jsx": {
+      "choice_label": "React JSX Mode",
+      "rules": [
+        "Include: import Question from '@/components/Question';",
+        "Include: import CodeBlock from '@/components/CodeBlock';",
+        "Export metadata: export const meta = { title: '...', order: ... };",
+        "Default Export: function returning <div className='space-y-8'>.",
+        "Every topic must be wrapped in: <Question number='X' text='...'> [Content] </Question>",
+        "All code must use: <CodeBlock language='c' code={`...`} />",
+        "Use Tailwind CSS for custom coloring or layout needs."
+      ]
+    }
+  },
+  "execution_command": "I will provide content. You will ask me: 'Should I generate this as Step 1 (Markdown) or Step 2 (JSX)?' Then you will follow the rules in this JSON."
+}
+How to use this:
+
+Copy the JSON code above.
+
+Paste it into a new chat with ChatGPT or Claude.
+
+Upload your study material (PDF, Image, or Text).
+
+The AI will now understand:
+
+It shouldn't count ../ (it uses @/).
+
+It knows that ## in Markdown creates your beautiful cards.
+
+It knows who you are and where you study.
+
+Simply say: "Apply Step 1" for Markdown or "Apply Step 2" for JSX.

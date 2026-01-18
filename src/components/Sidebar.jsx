@@ -45,7 +45,7 @@ const Sidebar = ({ tree, onCloseMobile }) => {
           onClick={onCloseMobile} 
           className="text-2xl font-bold text-blue-600 hover:text-blue-700 transition-colors tracking-tight"
         >
-          Exam<span className="text-gray-800 dark:text-white">Notes</span>
+          Student<span className="text-gray-800 dark:text-white">Notes</span>
         </Link>
       </div>
 

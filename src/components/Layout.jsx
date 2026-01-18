@@ -116,7 +116,7 @@ const Layout = ({ tree }) => {
                 {sidebarOpen ? 'Close Menu' : 'Menu'}
               </button>
             )}
-            {isHomePage && <span className="text-xl font-bold text-blue-600">ExamNotes</span>}
+            {isHomePage && <span className="text-xl font-bold text-blue-600">StudentsNotes</span>}
           </div>
 
           <div className="flex items-center gap-3">

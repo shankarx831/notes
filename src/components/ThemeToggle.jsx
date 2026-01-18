@@ -63,7 +63,7 @@ const ThemeToggle = () => {
         clipPath: clipPath,
       },
       {
-        duration: 500,
+        duration: 400,
         easing: 'ease-in-out',
         // Start the pseudo-element animation
         pseudoElement: '::view-transition-new(root)',

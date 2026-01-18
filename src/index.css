@@ -2,51 +2,103 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body, #root { height: 100%; }
+html,
+body,
+#root {
+  height: 100%;
+}
 
-/* --- 1. APP STYLES --- */
+/* --- 1. APP BRANDING --- */
 .concept-title {
   @apply font-bold text-lg mb-2 flex items-center gap-2 text-blue-600 dark:text-blue-400;
 }
+
 .key-point {
   @apply font-semibold text-gray-900 dark:text-gray-100;
 }
 
-/* --- 2. VIEW TRANSITION API OVERRIDES --- */
-/* This is crucial for the "Circle Wipe" animation to work smoothly */
-
-/* Disable the default cross-fade so our JS animation is visible */
+/* --- 2. VIEW TRANSITION API (Circle Wipe) --- */
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
   mix-blend-mode: normal;
 }
 
-/* Ensure the 'new' view sits on top so the circle reveals it */
 ::view-transition-new(root) {
   z-index: 9999;
 }
 
-/* Apply smooth color transitions to the body content */
 @layer base {
   body {
     @apply transition-colors duration-300 ease-in-out;
   }
 }
 
-/* --- 3. PDF MODE OVERRIDES --- */
-/* These rules only apply when generating PDFs to force "Ink Saver" mode */
+/* --- 3. KATEX FIX (Tailwind Conflict Resolver) --- */
+/* 
+ * The KEY insight: Don't override font-family! 
+ * KaTeX uses multiple specialized fonts (Main, Math, Size1-4, AMS)
+ * and selects them per-character. Overriding breaks this mechanism.
+ * We ONLY fix Tailwind's aggressive resets.
+ */
 
-.pdf-mode { @apply bg-white !important; }
-
-.pdf-mode * { 
-  @apply text-black border-gray-300 !important; 
-  text-shadow: none !important; 
-  box-shadow: none !important; 
-  background-color: transparent !important;
+/* Stop Tailwind from breaking KaTeX layout */
+.katex,
+.katex * {
+  border-style: none !important;
+  /* Tailwind adds borders */
+  box-sizing: content-box !important;
+  /* KaTeX needs content-box */
+  line-height: normal !important;
+  /* Tailwind normalizes line-height */
+  text-rendering: auto !important;
+  letter-spacing: normal !important;
+  word-spacing: normal !important;
+  text-indent: 0 !important;
 }
 
-/* Header/Gradient Fixes for PDF (White box with border) */
+/* Restore borders ONLY where KaTeX needs them */
+.katex .frac-line,
+.katex .sqrt-line,
+.katex .overline-line,
+.katex .underline-line,
+.katex .hline {
+  border-bottom-style: solid !important;
+  border-bottom-width: 0.04em !important;
+  border-color: currentColor !important;
+}
+
+/* Ensure KaTeX display mode has proper spacing */
+.katex-display {
+  @apply my-6 py-2 overflow-x-auto overflow-y-hidden;
+  display: block !important;
+  text-align: center !important;
+}
+
+/* Dark Mode: Ensure visibility */
+.dark .katex {
+  color: #f1f5f9 !important;
+}
+
+/* --- 4. PDF MODE (Ink Saver & Watermarks) --- */
+
+.pdf-mode {
+  @apply bg-white !important;
+}
+
+.pdf-mode * {
+  @apply text-black border-gray-300 !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+}
+
+/* Force math to black in PDF */
+.pdf-mode .katex {
+  color: black !important;
+}
+
+/* Transform Blue Banners to Professional Outlined Boxes for Print */
+.pdf-mode .bg-gradient-to-br,
 .pdf-mode .bg-gradient-to-r,
 .pdf-mode [class*="bg-gradient-"] {
   background: #ffffff !important;
@@ -55,26 +107,42 @@ html, body, #root { height: 100%; }
   color: #000000 !important;
 }
 
-/* Hiding Elements (Buttons, Nav) */
-.pdf-mode .pdf-hide { display: none !important; }
-
-/* SHOWING Elements (For PDF Only - like the GitHub link) */
-.pdf-only { display: none !important; } /* Hidden by default on screen */
-.pdf-mode .pdf-only { display: block !important; } /* Visible only in PDF */
-
-/* Code Block Fixes for Print */
-.pdf-mode .code-block-container { 
-  background-color: #ffffff !important; 
-  border: 1px solid #000000 !important; 
-  margin: 10px 0 !important; 
+/* Control Visibility */
+.pdf-mode .pdf-hide {
+  display: none !important;
 }
-.pdf-mode .code-block-header { 
-  background-color: #f3f4f6 !important; 
-  border-bottom: 1px solid #000000 !important; 
+
+.pdf-only {
+  display: none !important;
 }
-.pdf-mode pre, 
-.pdf-mode code, 
-.pdf-mode span { 
-  color: #000000 !important; 
-  background: transparent !important; 
+
+.pdf-mode .pdf-only {
+  display: block !important;
+}
+
+/* Printer-Friendly Code Blocks */
+.pdf-mode .code-block-container {
+  background-color: #ffffff !important;
+  border: 1px solid #000000 !important;
+}
+
+.pdf-mode .code-block-header {
+  background-color: #f3f4f6 !important;
+  border-bottom: 1px solid #000000 !important;
+}
+
+.pdf-mode pre,
+.pdf-mode code,
+.pdf-mode span {
+  color: #000000 !important;
+  background: transparent !important;
+}
+
+/* Clean up spacing for Markdown rendering */
+.prose :first-child {
+  margin-top: 0 !important;
+}
+
+.prose :last-child {
+  margin-bottom: 0 !important;
 }
