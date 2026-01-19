@@ -33,9 +33,22 @@ public class AuditService {
     private AuditLogRepository auditLogRepository;
 
     /**
-     * Logs an action synchronously.
-     * Uses a new transaction to ensure the log is persisted even if the main
-     * transaction fails.
+     * Logs an action synchronously within a nested independent transaction.
+     * <p>
+     * <strong>Reliability Invariant:</strong> This method uses
+     * {@code Propagation.REQUIRES_NEW} to ensure
+     * that audit entries are persisted even if the calling business transaction
+     * (e.g., a Note upload)
+     * fails or is rolled back. This is critical for forensic tracking of failed
+     * attempts.
+     * </p>
+     * 
+     * @param action      The specific domain action being captured.
+     * @param actor       The authenticated user performing the action.
+     * @param targetType  The string literal for the entity type (e.g., "Note").
+     * @param targetId    The database ID of the subject entity.
+     * @param description A human-readable summary of the event.
+     * @return The saved AuditLog entry.
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public AuditLog logAction(AuditAction action, User actor, String targetType, Long targetId, String description) {
@@ -43,7 +56,11 @@ public class AuditService {
     }
 
     /**
-     * Logs an action with state changes.
+     * Logs an action with detailed state changes for deep auditing.
+     *
+     * @param previousState The JSON or string representation of data BEFORE the
+     *                      change.
+     * @param newState      The state AFTER the change.
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public AuditLog logAction(
@@ -84,7 +101,14 @@ public class AuditService {
     }
 
     /**
-     * Logs an action asynchronously for non-critical audit entries.
+     * Logs an action asynchronously.
+     * <p>
+     * <strong>Performance Optimization:</strong> Use this for non-critical audit
+     * events
+     * where blocking the user's request thread for an I/O operation is undesirable.
+     * Errors in the background thread are caught and logged without affecting the
+     * user.
+     * </p>
      */
     @Async
     @Transactional(propagation = Propagation.REQUIRES_NEW)

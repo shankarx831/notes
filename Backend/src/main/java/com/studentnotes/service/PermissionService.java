@@ -27,8 +27,22 @@ public class PermissionService {
     private FolderPermissionRepository folderPermissionRepository;
 
     /**
-     * Checks if a user has read permission for a folder path.
-     * Admins have implicit access to everything.
+     * Checks if a user has read access for a specific folder path.
+     * <p>
+     * <strong>Hierarchical Access Logic:</strong>
+     * Access is granted if:
+     * <ol>
+     * <li>User is an {@code ADMIN}.</li>
+     * <li>User belongs to the department mapped to the root of the
+     * {@code folderPath}.</li>
+     * <li>A specific {@link FolderPermission} entry covers this path or a parent
+     * path.</li>
+     * </ol>
+     * </p>
+     *
+     * @param user       The user object (must contain loaded department scope).
+     * @param folderPath The string path (e.g., "cs/year1/networks").
+     * @return true if access is explicitly or implicitly granted.
      */
     @Transactional(readOnly = true)
     public boolean hasReadPermission(User user, String folderPath) {
@@ -37,17 +51,26 @@ public class PermissionService {
             return true;
         }
 
-        // Check department-level access first
+        // Check department-level access first (implicit wide-read for dept members)
         if (hasDepartmentAccess(user, folderPath)) {
             return true;
         }
 
-        // Check folder-level permissions
+        // Check folder-level permissions (explicit grant)
         return hasPermission(user.getId(), folderPath, PermissionType.READ);
     }
 
     /**
-     * Checks if a user has write permission for a folder path.
+     * Checks if a user has write permission (upload/edit) for a folder path.
+     * <p>
+     * <strong>Security Constraint:</strong> Write access is restricted to owners
+     * or those with explicit {@code WRITE} permission. Department members
+     * do not get implicit write access unless permitted.
+     * </p>
+     *
+     * @param user       The user attempting the write operation.
+     * @param folderPath The target folder.
+     * @return true if write access is granted.
      */
     @Transactional(readOnly = true)
     public boolean hasWritePermission(User user, String folderPath) {
@@ -55,7 +78,9 @@ public class PermissionService {
             return true;
         }
 
-        // Teachers need explicit write permission
+        // Teachers usually need to be in the department AND have a WRITE grant
+        // Extracting department check to ensure teachers don't write to other
+        // departments
         if (!hasDepartmentAccess(user, folderPath)) {
             return false;
         }
@@ -65,6 +90,10 @@ public class PermissionService {
 
     /**
      * Checks if a user has delete permission for a folder path.
+     * <p>
+     * Note: Deletions are typically handled via {@code DeletionRequest} workflow,
+     * but this check remains for direct operations by authorized roles.
+     * </p>
      */
     @Transactional(readOnly = true)
     public boolean hasDeletePermission(User user, String folderPath) {
@@ -76,7 +105,7 @@ public class PermissionService {
     }
 
     /**
-     * Checks if user has manage permission (publish/archive).
+     * Checks if user has management permissions (publishing drafts or archiving).
      */
     @Transactional(readOnly = true)
     public boolean hasManagePermission(User user, String folderPath) {
@@ -88,7 +117,13 @@ public class PermissionService {
     }
 
     /**
-     * Asserts that user has the specified permission, throws if not.
+     * Asserts that user has required permission, otherwise throws
+     * {@link AccessDeniedException}.
+     * 
+     * @param user       User to check.
+     * @param folderPath Resource path.
+     * @param type       Specific permission type required.
+     * @throws AccessDeniedException if permission check fails.
      */
     public void assertPermission(User user, String folderPath, PermissionType type) {
         boolean hasPermission = switch (type) {

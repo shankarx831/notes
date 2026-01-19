@@ -49,7 +49,28 @@ public class NoteService {
     private AuditService auditService;
 
     /**
-     * Creates a new note with initial version.
+     * Creates a new {@link Note} entity and persists its initial
+     * {@link NoteVersion} snapshot v1.
+     * <p>
+     * <strong>Transactional Boundary:</strong> This method executes atomically. If
+     * the version creation
+     * or audit logging fails, the Note record is rolled back to prevent phantom
+     * data.
+     * </p>
+     * <strong>Invariants:</strong>
+     * <ul>
+     * <li>Content payload must be &lt; 10MB to protect heap memory.</li>
+     * <li>User must hold explicit {@code WRITE} permission on the target folder
+     * path.</li>
+     * <li>The Note status defaults to {@code DRAFT} unless
+     * {@code publishImmediately} is explicitly requested.</li>
+     * </ul>
+     *
+     * @param teacher The user attempting the upload (must be authenticated).
+     * @param request The data payload containing metadata and content.
+     * @return The persisted Note entity with generated ID.
+     * @throws ValidationException   if content exceeds size limits.
+     * @throws AccessDeniedException if the user lacks folder permissions.
      */
     @Transactional
     public Note createNote(User teacher, CreateNoteRequest request) {
@@ -112,7 +133,30 @@ public class NoteService {
     }
 
     /**
-     * Updates a note, creating a new version.
+     * Updates an existing note and generates a new immutable version.
+     * <p>
+     * <strong>Concurrency:</strong> This method relies on optimistic locking via
+     * JPA versioning (implicit)
+     * or explicit status checks. If a {@link ConcurrentModificationException}
+     * occurs, the client must retry.
+     * </p>
+     * <strong>Logic Flow:</strong>
+     * <ol>
+     * <li>Verifies ownership OR the {@code MANAGE} permission for the note's
+     * folder.</li>
+     * <li>Validates new content size (if changed).</li>
+     * <li>Updates the mutable {@link Note} entity.</li>
+     * <li>Snapshots the new state into a new {@link NoteVersion} (v+1).</li>
+     * <li>Logs the action to the Audit Trail with the "Before" vs "After"
+     * context.</li>
+     * </ol>
+     *
+     * @param teacher      The user attempting the update.
+     * @param notePublicId The reliable UUID of the note.
+     * @param request      The data fields to patch. Null fields are ignored.
+     * @return The updated Note entity.
+     * @throws ResourceNotFoundException if the ID is invalid.
+     * @throws AccessDeniedException     if the user does not own the note.
      */
     @Transactional
     public Note updateNote(User teacher, String notePublicId, UpdateNoteRequest request) {
