@@ -1,18 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, useLocation, Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import Sidebar from './Sidebar';
 import { exportNoteToPdf } from '../utils/pdfExporter';
 import ThemeToggle from './ThemeToggle';
 import SearchModal from './SearchModal';
 import PdfLoader from './PdfLoader';
 import MarkdownViewer from './MarkdownViewer';
-import { useAuth } from '../context/AuthContext'; // ✅ AUTH
+import { useAuth } from '../context/AuthContext';
+import { useData } from '../context/DataProvider';
 
 const Layout = ({ tree }) => {
   const location = useLocation();
   const isHomePage = location.pathname === '/';
 
-  const { user, logout } = useAuth(); // ✅ AUTH STATE
+  const { user, logout } = useAuth();
+  const { mode } = useData();
 
   const [sidebarOpen, setSidebarOpen] = useState(!isHomePage);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -169,7 +172,7 @@ const Layout = ({ tree }) => {
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
                 </button>
               </div>
-            ) : (
+            ) : mode === 'dynamic' && (
               <Link
                 to="/login"
                 className="px-6 py-2.5 text-xs font-black uppercase tracking-widest text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20"
@@ -208,25 +211,44 @@ const Layout = ({ tree }) => {
         </header>
 
         {/* ================= MAIN ================= */}
-        <main className="flex-1 overflow-hidden flex">
-          {isSplitView && pinnedContent && (
-            <div className="w-1/2 border-r dark:border-slate-800 overflow-y-auto p-6 bg-slate-50 dark:bg-slate-900/50">
-              <div className="mb-4 flex items-center justify-between">
-                <span className="text-[10px] font-black uppercase tracking-widest text-blue-600">Reference Mode</span>
-                <span className="text-xs font-bold text-slate-500 truncate max-w-[200px]">{pinnedContent.meta?.title}</span>
+        <main className="flex-1 overflow-hidden flex bg-slate-50 dark:bg-gray-900 relative">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={location.pathname}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
+              className={`overflow-y-auto w-full h-full flex flex-col`}
+            >
+              <div className="flex-1 flex flex-col">
+                {isSplitView && pinnedContent ? (
+                  <div className="flex h-full">
+                    <div className="w-1/2 border-r dark:border-slate-800 overflow-y-auto p-6 bg-slate-50 dark:bg-slate-900/50">
+                      <div className="mb-4 flex items-center justify-between">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-blue-600">Reference Mode</span>
+                        <span className="text-xs font-bold text-slate-500 truncate max-w-[200px]">{pinnedContent.meta?.title}</span>
+                      </div>
+                      {pinnedContent.type === 'md' ? (
+                        <MarkdownViewer content={pinnedContent.content} />
+                      ) : (
+                        <div className="p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+                          <p className="text-sm text-slate-500 text-center py-8">Interactive content not supported in split view</p>
+                        </div>
+                      )}
+                    </div>
+                    <div className="w-1/2 overflow-y-auto p-6">
+                      <Outlet />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-6">
+                    <Outlet />
+                  </div>
+                )}
               </div>
-              {pinnedContent.type === 'md' ? (
-                <MarkdownViewer content={pinnedContent.content} />
-              ) : (
-                <div className="p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
-                  <p className="text-sm text-slate-500 text-center py-8">Interactive content not supported in split view</p>
-                </div>
-              )}
-            </div>
-          )}
-          <div className={`overflow-y-auto p-6 ${isSplitView ? 'w-1/2' : 'w-full'}`}>
-            <Outlet />
-          </div>
+            </motion.div>
+          </AnimatePresence>
         </main>
 
         <SearchModal tree={tree} isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />

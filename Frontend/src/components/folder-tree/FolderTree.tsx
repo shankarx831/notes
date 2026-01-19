@@ -44,30 +44,27 @@ export const TreeNode: React.FC<NodeProps> = ({ node, level }) => {
         if (isFolder) setIsOpen(!isOpen);
     };
 
-    // Generate link if it's a file
-    // Note path structure: /dept/year/section/subject/id
-    // Incoming node.path from transform might be messy, let's rely on node.fileData
     const getLink = () => {
         if (!node.fileData) return '#';
-        // Reconstruct path from note metadata or params
-        // Assuming node.fileData contains everything needed
         const n = node.fileData;
-        // Note: Using `any` cast if properties missing in strict Note type, but they should be there
         return `/${n.department}/${n.year}/${n.section || 'section-default'}/${n.subject}/${n.id}`;
     };
 
     return (
         <div className="select-none">
             <motion.div
+                layout
                 onClick={toggleOpen}
                 className={clsx(
-                    "flex items-center gap-3 py-3 px-4 my-1 rounded-xl cursor-pointer transition-colors active:scale-[0.98] touch-manipulation",
+                    "flex items-center gap-3 py-3 px-4 my-1 rounded-xl cursor-pointer transition-colors active:scale-[0.98] touch-manipulation relative overflow-hidden",
                     level === 0 ? "bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700" : "hover:bg-gray-100 dark:hover:bg-gray-800/50",
-                    !isFolder && "ml-4 border-l-2 border-gray-100 dark:border-gray-800 hover:border-blue-500"
+                    !isFolder && "ml-4 border-l-2 border-gray-100 dark:border-gray-800 hover:border-blue-500 bg-white/50 dark:bg-gray-900/50"
                 )}
                 style={{ marginLeft: level > 0 ? `${level * 12}px` : 0 }}
                 whileTap={{ scale: 0.98 }}
             >
+                {/* Ripple effect or highlight could go here */}
+
                 {/* Expansion Icon */}
                 <div className={clsx("transition-transform duration-200", isOpen && "rotate-90")}>
                     {isFolder && hasChildren && <ChevronRight />}
@@ -80,38 +77,51 @@ export const TreeNode: React.FC<NodeProps> = ({ node, level }) => {
 
                 {/* Label */}
                 {isFolder ? (
-                    <span className="font-semibold text-gray-700 dark:text-gray-200 capitalize flex-1 text-sm md:text-base">
+                    <span className="font-semibold text-gray-700 dark:text-gray-200 capitalize flex-1 text-sm md:text-base tracking-tight">
                         {node.name.replace(/-/g, ' ')}
                     </span>
                 ) : (
                     <Link
                         to={getLink()}
-                        className="flex-1 min-w-0"
+                        className="flex-1 min-w-0 group"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <div className="font-medium text-gray-900 dark:text-gray-100 text-sm truncate">
+                        <div className="font-medium text-gray-900 dark:text-gray-100 text-sm truncate group-hover:text-blue-600 transition-colors">
                             {node.name}
                         </div>
-                        <div className="text-[10px] text-gray-400 uppercase tracking-wider mt-0.5">
-                            {node.fileData?.updatedAt?.split('T')[0] || 'Recently'}
-                        </div>
+                        {node.fileData?.updatedAt && (
+                            <div className="text-[10px] text-gray-400 uppercase tracking-wider mt-0.5">
+                                Updated {new Date(node.fileData.updatedAt).toLocaleDateString()}
+                            </div>
+                        )}
                     </Link>
                 )}
             </motion.div>
 
-            {/* Children Recursion */}
+            {/* Children Recursion with Staggered Animation */}
             <AnimatePresence>
                 {isOpen && hasChildren && (
                     <motion.div
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.2, ease: "easeInOut" }}
+                        transition={{ duration: 0.3, ease: "easeOut" }}
                         className="overflow-hidden"
                     >
-                        {node.children!.map((child) => (
-                            <TreeNode key={child.id} node={child} level={level + 1} />
-                        ))}
+                        <motion.div
+                            variants={{
+                                hidden: { opacity: 0 },
+                                show: { opacity: 1, transition: { staggerChildren: 0.05 } }
+                            }}
+                            initial="hidden"
+                            animate="show"
+                        >
+                            {node.children!.map((child) => (
+                                <motion.div key={child.id} variants={{ hidden: { x: -10, opacity: 0 }, show: { x: 0, opacity: 1 } }}>
+                                    <TreeNode node={child} level={level + 1} />
+                                </motion.div>
+                            ))}
+                        </motion.div>
                     </motion.div>
                 )}
             </AnimatePresence>
