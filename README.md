@@ -22,9 +22,9 @@ graph TD
     DB[(PostgreSQL)]
     FS[FileSystem / JSON Tree]
 
-    User -->|Read Content (Static)| CDN
+    User -->|"Read Content (Static)"| CDN
     CDN -->|Load| FS
-    User -->|Auth & Upload (Dynamic)| Backend
+    User -->|"Auth & Upload (Dynamic)"| Backend
     Backend -->|Persist| DB
     Backend -->|Sync| FS
 ```
