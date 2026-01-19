@@ -24,25 +24,25 @@
     font-family: 'Outfit', sans-serif;
   }
 
-  /* Sepia Theme - Eye comfort for long reading sessions */
+  /* Reading Theme (Solarized Light) - Scientifically balanced for eye comfort */
   .sepia {
-    --bg-sepia: #f4ecd8;
-    --text-sepia: #433422;
+    --bg-sepia: #fdf6e3;
+    --text-sepia: #586e75;
   }
 
   .sepia body {
-    background-color: #f4ecd8 !important;
-    color: #433422 !important;
+    background-color: #fdf6e3 !important;
+    color: #586e75 !important;
   }
 
   .sepia .glass-panel {
-    background: rgba(255, 255, 255, 0.4) !important;
-    border-color: #dcd0ac !important;
+    background: rgba(253, 246, 227, 0.8) !important;
+    border-color: #eee8d5 !important;
   }
 
   .sepia .katex-display {
-    background-color: rgba(67, 52, 34, 0.05) !important;
-    border-color: #dcd0ac !important;
+    background-color: #eee8d5 !important;
+    border-color: #93a1a1 !important;
   }
 
   code,
