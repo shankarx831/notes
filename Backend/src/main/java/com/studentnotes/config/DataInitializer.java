@@ -1,6 +1,7 @@
 package com.studentnotes.config;
 
 import com.studentnotes.model.User;
+import com.studentnotes.model.enums.UserStatus;
 import com.studentnotes.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -23,7 +24,7 @@ public class DataInitializer {
                 teacher.setName("Test Teacher");
                 teacher.setRole("ROLE_TEACHER");
                 teacher.setAssignedDepartments(List.of("it"));
-                teacher.setEnabled(true);
+                teacher.setStatus(UserStatus.ACTIVE); // Use status enum
                 userRepository.save(teacher);
                 System.out.println("Created test teacher: teacher@test.com");
             }
@@ -31,18 +32,20 @@ public class DataInitializer {
             // Ensure admin exists AND has a known password (admin123)
             userRepository.findByEmail("admin@test.com").ifPresentOrElse(
                     admin -> {
-                        admin.setPassword(passwordEncoder.encode("admin123"));
+                        admin.setPassword(passwordEncoder.encode("adminNew123"));
                         admin.setName("Super Admin");
                         admin.setRole("ROLE_ADMIN");
+                        admin.setStatus(UserStatus.ACTIVE); // Use status enum
                         userRepository.save(admin);
-                        System.out.println("🔄 Admin password reset to: admin123");
+                        System.out.println("🔄 Admin password reset to: adminNew123");
                     },
                     () -> {
                         User admin = new User();
                         admin.setEmail("admin@test.com");
-                        admin.setPassword(passwordEncoder.encode("admin123"));
+                        admin.setPassword(passwordEncoder.encode("adminNew123"));
                         admin.setName("Super Admin");
                         admin.setRole("ROLE_ADMIN");
+                        admin.setStatus(UserStatus.ACTIVE); // Use status enum
                         userRepository.save(admin);
                         System.out.println("✨ Created Super Admin: admin@test.com");
                     });

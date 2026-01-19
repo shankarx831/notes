@@ -1,1 +1,4 @@
 /Users/shankar/Projects/Notes folder/exam-notes/Backend/src/test/java/com/studentnotes/BackendApplicationTests.java
+/Users/shankar/Projects/Notes folder/exam-notes/Backend/src/test/java/com/studentnotes/service/AdminDashboardServiceTest.java
+/Users/shankar/Projects/Notes folder/exam-notes/Backend/src/test/java/com/studentnotes/service/DeletionRequestServiceTest.java
+/Users/shankar/Projects/Notes folder/exam-notes/Backend/src/test/java/com/studentnotes/service/PermissionServiceTest.java

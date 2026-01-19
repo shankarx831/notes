@@ -1,6 +1,7 @@
 package com.studentnotes.config;
 
 import com.studentnotes.model.Note;
+import com.studentnotes.model.enums.NoteStatus;
 import com.studentnotes.repository.NoteRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -57,7 +58,7 @@ public class ProjectSeeder {
                                     note.setSection(section);
                                     note.setSubject(subject);
                                     note.setType("md");
-                                    note.setEnabled(true);
+                                    note.setStatus(NoteStatus.PUBLISHED); // Use status enum
                                     note.setUploadedByName("Super Admin");
                                     note.setUploadedByEmail("admin@test.com");
                                     noteRepository.save(note);

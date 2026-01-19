@@ -7,7 +7,7 @@ import Login from './pages/Login';
 import TeacherUpload from './pages/TeacherUpload';
 import AdminDashboard from './pages/AdminDashboard';
 import Footer from './components/Footer';
-import MarkdownViewer from './components/MarkdownViewer';
+import { MarkdownRenderer } from './components/note-viewer/MarkdownRenderer';
 import DownloadPdfButton from './components/DownloadPdfButton';
 
 // --- Constants ---
@@ -147,7 +147,7 @@ const PageWrapper = ({ noteData, dept, year, section, subj }) => {
               {meta.title}
             </h1>
             <div className="prose dark:prose-invert max-w-none text-lg">
-              <MarkdownViewer content={content} />
+              <MarkdownRenderer content={content} />
             </div>
             <div className="mt-20 pt-10 border-t border-gray-100 dark:border-gray-800 text-center text-gray-400 text-sm italic">
               End of "{meta.title}" - Study hard!
@@ -183,7 +183,7 @@ const PageWrapper = ({ noteData, dept, year, section, subj }) => {
           <span className="w-1 h-1 rounded-full bg-gray-300"></span>
           <span>{dept}</span>
           <span className="w-1 h-1 rounded-full bg-gray-300"></span>
-          <span>{subject}</span>
+          <span>{subj}</span>
         </div>
       </div>
 
@@ -278,7 +278,7 @@ const PageWrapper = ({ noteData, dept, year, section, subj }) => {
         {/* --- CONTENT AREA --- */}
         <div className="flex-1 min-w-0 min-h-[60vh]">
           {type === 'md' ? (
-            <MarkdownViewer content={content} />
+            <MarkdownRenderer content={content} />
           ) : (
             <div className="bg-white dark:bg-gray-800 p-6 md:p-10 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
               <Component />
