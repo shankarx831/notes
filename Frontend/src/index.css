@@ -24,6 +24,27 @@
     font-family: 'Outfit', sans-serif;
   }
 
+  /* Sepia Theme - Eye comfort for long reading sessions */
+  .sepia {
+    --bg-sepia: #f4ecd8;
+    --text-sepia: #433422;
+  }
+
+  .sepia body {
+    background-color: #f4ecd8 !important;
+    color: #433422 !important;
+  }
+
+  .sepia .glass-panel {
+    background: rgba(255, 255, 255, 0.4) !important;
+    border-color: #dcd0ac !important;
+  }
+
+  .sepia .katex-display {
+    background-color: rgba(67, 52, 34, 0.05) !important;
+    border-color: #dcd0ac !important;
+  }
+
   code,
   pre,
   .font-mono {
