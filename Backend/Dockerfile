@@ -1,16 +1,33 @@
-# Stage 1: Build with Maven + Temurin JDK 21
-FROM maven:3.9.3-eclipse-temurin-21 AS build
+# -------------------------
+# Stage 1: Build with JDK 21 + system Maven (works reliably)
+# -------------------------
+FROM eclipse-temurin:21 AS build
+
 WORKDIR /app
+
+# Install Maven (Debian-based image: apt available)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends maven ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy project and build
 COPY pom.xml .
 COPY src ./src
-RUN mvn clean package -DskipTests
 
-# Stage 2: Run on lightweight Temurin Alpine JDK
+# Build the JAR (skip tests on CI builds for speed if you must; prefer not)
+RUN mvn -B clean package -DskipTests
+
+# -------------------------
+# Stage 2: Run the application on lightweight Temurin Alpine JDK
+# -------------------------
 FROM eclipse-temurin:21-jdk-alpine
-WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
 
-# Let Spring bind to Render's injected PORT (server.port=${PORT:8080} in app)
+WORKDIR /app
+
+# Copy the produced jar (wildcard to handle name)
+COPY --from=build /app/target/*.jar /app/app.jar
+
+# Allow binding to Render-injected PORT via server.port=${PORT:8080}
 ENV PORT=8080
 EXPOSE 8080
 
