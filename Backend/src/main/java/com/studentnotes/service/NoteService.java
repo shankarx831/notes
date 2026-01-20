@@ -48,6 +48,9 @@ public class NoteService {
     @Autowired
     private AuditService auditService;
 
+    @Autowired
+    private com.studentnotes.repository.DepartmentRepository departmentRepository;
+
     /**
      * Creates a new {@link Note} entity and persists its initial
      * {@link NoteVersion} snapshot v1.
@@ -73,6 +76,7 @@ public class NoteService {
      * @throws AccessDeniedException if the user lacks folder permissions.
      */
     @Transactional
+    @org.springframework.cache.annotation.CacheEvict(value = "publicNoteTree", allEntries = true)
     public Note createNote(User teacher, CreateNoteRequest request) {
         // Validate file size
         if (request.getContent() != null) {
@@ -159,6 +163,7 @@ public class NoteService {
      * @throws AccessDeniedException     if the user does not own the note.
      */
     @Transactional
+    @org.springframework.cache.annotation.CacheEvict(value = "publicNoteTree", allEntries = true)
     public Note updateNote(User teacher, String notePublicId, UpdateNoteRequest request) {
         Note note = noteRepository.findByPublicId(notePublicId)
                 .orElseThrow(() -> ResourceNotFoundException.note(notePublicId));
@@ -228,6 +233,7 @@ public class NoteService {
      * Publishes a draft note.
      */
     @Transactional
+    @org.springframework.cache.annotation.CacheEvict(value = "publicNoteTree", allEntries = true)
     public Note publishNote(User user, String notePublicId) {
         Note note = noteRepository.findByPublicId(notePublicId)
                 .orElseThrow(() -> ResourceNotFoundException.note(notePublicId));
@@ -405,6 +411,63 @@ public class NoteService {
                 note.getUploadedByUserId().equals(user.getId());
     }
 
+    @Transactional(readOnly = true)
+    @org.springframework.cache.annotation.Cacheable(value = "publicNoteTree")
+    @SuppressWarnings("unchecked")
+    public java.util.Map<String, Object> getPublicNoteTree() {
+        // Fetch only enabled notes
+        List<Note> notes = noteRepository.findByEnabledTrue();
+
+        // Root Tree Map
+        java.util.Map<String, Object> tree = new java.util.HashMap<>();
+
+        // 1. Pre-fill with all managed departments
+        for (com.studentnotes.model.Department d : departmentRepository.findAll()) {
+            tree.put(d.getName(), new java.util.HashMap<String, Object>());
+        }
+
+        for (Note n : notes) {
+            // 2. Get or Create Department Map
+            java.util.Map<String, Object> deptMap = (java.util.Map<String, Object>) tree.computeIfAbsent(
+                    n.getDepartment(),
+                    k -> new java.util.HashMap<>());
+
+            // 3. Get or Create Year Map
+            java.util.Map<String, Object> yearMap = (java.util.Map<String, Object>) deptMap.computeIfAbsent(n.getYear(),
+                    k -> new java.util.HashMap<>());
+
+            // 4. Get or Create Section Map
+            java.util.Map<String, Object> sectionMap = (java.util.Map<String, Object>) yearMap.computeIfAbsent(
+                    n.getSection(),
+                    k -> new java.util.HashMap<>());
+
+            // 5. Get or Create Subject List
+            List<java.util.Map<String, Object>> subjectList = (List<java.util.Map<String, Object>>) sectionMap
+                    .computeIfAbsent(n.getSubject(), k -> new java.util.ArrayList<>());
+
+            // 6. Create Note Object
+            java.util.Map<String, Object> noteData = new java.util.HashMap<>();
+            noteData.put("id", n.getPublicId()); // Use Public ID for security
+            noteData.put("type", "md");
+            noteData.put("content", n.getContent());
+
+            java.util.Map<String, Object> meta = new java.util.HashMap<>();
+            meta.put("title", n.getTitle());
+            meta.put("order", 999);
+            meta.put("likes", n.getLikes());
+            meta.put("dislikes", n.getDislikes());
+            meta.put("uploadedBy", n.getUploadedByName());
+            meta.put("uploadedByEmail", n.getUploadedByEmail());
+            meta.put("createdAt", n.getCreatedAt());
+
+            noteData.put("meta", meta);
+
+            // Add to list
+            subjectList.add(noteData);
+        }
+        return tree;
+    }
+
     private String buildFolderPath(String department, String year, String section, String subject) {
         StringBuilder path = new StringBuilder(department);
         if (year != null) {
@@ -418,4 +481,5 @@ public class NoteService {
         }
         return path.toString();
     }
+
 }

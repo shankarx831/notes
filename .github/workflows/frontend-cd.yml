@@ -1,0 +1,36 @@
+name: Frontend CD
+
+# Only trigger after Frontend CI completes successfully
+on:
+  workflow_run:
+    workflows: ["Frontend CI"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    # Only run if the CI workflow succeeded
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Required for deploying to GitHub Pages
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # Download the artifact built in CI
+    - name: Download build artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: frontend-dist
+        path: Frontend/dist
+        run-id: ${{ github.event.workflow_run.id }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./Frontend/dist
+        force_orphan: true

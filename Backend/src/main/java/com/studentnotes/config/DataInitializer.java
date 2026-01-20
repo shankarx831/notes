@@ -29,25 +29,25 @@ public class DataInitializer {
                 System.out.println("Created test teacher: teacher@test.com");
             }
 
-            // Ensure admin exists AND has a known password (admin123)
-            userRepository.findByEmail("admin@test.com").ifPresentOrElse(
+            // Ensure admin exists AND has a known password
+            userRepository.findByEmail("shankar").ifPresentOrElse(
                     admin -> {
-                        admin.setPassword(passwordEncoder.encode("adminNew123"));
-                        admin.setName("Super Admin");
+                        admin.setPassword(passwordEncoder.encode("Shankar2000"));
+                        admin.setName("Shankar");
                         admin.setRole("ROLE_ADMIN");
                         admin.setStatus(UserStatus.ACTIVE); // Use status enum
                         userRepository.save(admin);
-                        System.out.println("🔄 Admin password reset to: adminNew123");
+                        System.out.println("🔄 Admin password reset for user: shankar");
                     },
                     () -> {
                         User admin = new User();
-                        admin.setEmail("admin@test.com");
-                        admin.setPassword(passwordEncoder.encode("adminNew123"));
-                        admin.setName("Super Admin");
+                        admin.setEmail("shankar"); // Using 'shankar' as username
+                        admin.setPassword(passwordEncoder.encode("Shankar2000"));
+                        admin.setName("Shankar");
                         admin.setRole("ROLE_ADMIN");
                         admin.setStatus(UserStatus.ACTIVE); // Use status enum
                         userRepository.save(admin);
-                        System.out.println("✨ Created Super Admin: admin@test.com");
+                        System.out.println("✨ Created Super Admin: shankar");
                     });
         };
     }

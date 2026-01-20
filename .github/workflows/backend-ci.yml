@@ -1,0 +1,35 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'Backend/**'
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - 'Backend/**'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./Backend
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        cache: 'maven'
+
+    # Maven Verify runs clean, compile, test, and package
+    # H2 DB is used via 'test' scope dependency in pom.xml
+    - name: Build and Test
+      run: mvn clean verify

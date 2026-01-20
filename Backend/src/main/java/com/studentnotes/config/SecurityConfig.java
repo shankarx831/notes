@@ -40,7 +40,7 @@ public class SecurityConfig {
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class) // <--- Add Filter Here
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/health", "/api/public/**", "/api/auth/**").permitAll()
+                        .requestMatchers("/api/health", "/api/health/db", "/api/public/**", "/api/auth/**").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/public/notes/**").permitAll()
                         .requestMatchers("/api/teacher/**").hasRole("TEACHER")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")

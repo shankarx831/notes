@@ -1,1 +1,14 @@
+com/studentnotes/service/PermissionServiceTest$MidSessionRevocationTests.class
+com/studentnotes/service/PermissionServiceTest$PermissionAssertionTests.class
 com/studentnotes/BackendApplicationTests.class
+com/studentnotes/service/AdminDashboardServiceTest$GetOverviewTests.class
+com/studentnotes/service/AdminDashboardServiceTest$GetPendingCountTests.class
+com/studentnotes/service/AdminDashboardServiceTest.class
+com/studentnotes/service/DeletionRequestServiceTest$ApproveDeletionRequestTests.class
+com/studentnotes/service/DeletionRequestServiceTest$CreateDeletionRequestTests.class
+com/studentnotes/service/DeletionRequestServiceTest$RejectDeletionRequestTests.class
+com/studentnotes/service/PermissionServiceTest$AdminPermissionTests.class
+com/studentnotes/service/PermissionServiceTest.class
+com/studentnotes/service/PermissionServiceTest$TeacherDepartmentAccessTests.class
+com/studentnotes/service/DeletionRequestServiceTest.class
+com/studentnotes/service/PermissionServiceTest$FolderLevelPermissionTests.class
