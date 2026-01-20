@@ -24,9 +24,9 @@ const Login = () => {
         <h1 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">Teacher Login</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
-            <input 
-              type="email" 
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email / Username</label>
+            <input
+              type="text"
               className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -34,8 +34,8 @@ const Login = () => {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
-            <input 
-              type="password" 
+            <input
+              type="password"
               className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               value={password}
               onChange={(e) => setPassword(e.target.value)}

@@ -50,7 +50,7 @@ const PageWrapper = ({ noteData, dept, year, section, subj }) => {
   const [isFocusMode, setIsFocusMode] = useState(false);
   const [showToC, setShowToC] = useState(true);
   const isDynamic = noteData.id && !isNaN(noteData.id);
-  const isSuperAdmin = noteData.uploadedByEmail === 'sankaranarayanan5.ssv@gmail.com';
+  const isSuperAdmin = noteData.uploadedByEmail === 'sankaranarayanan5.ssv@gmail.com' || noteData.uploadedByEmail === 'shankar';
   const displayUploaderName = isSuperAdmin || !isDynamic ? 'Shankar' : (noteData.uploadedByName || 'Shankar');
   const displayUploaderEmail = isSuperAdmin || !isDynamic ? 'shankar@smvec.ac.in' : (noteData.uploadedByEmail || 'shankar@smvec.ac.in');
 

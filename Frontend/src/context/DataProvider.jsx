@@ -19,7 +19,12 @@ export const DataProvider = ({ children }) => {
         if (isBackendUp) {
           console.log("✅ Backend ONLINE. Switching to Dynamic Mode.");
           const dynamicData = await fetchDynamicTree();
-          setTree(dynamicData);
+          const staticData = loadStaticTree();
+
+          // Merge static and dynamic trees
+          const mergedTree = mergeTrees(staticData, dynamicData);
+
+          setTree(mergedTree);
           setMode('dynamic');
           setBackendAvailable(true);
         } else {
@@ -57,3 +62,53 @@ export const DataProvider = ({ children }) => {
 };
 
 export const useData = () => useContext(DataContext);
+
+// Helper to merge static and dynamic trees
+const mergeTrees = (staticTree, dynamicTree) => {
+  const merged = { ...staticTree };
+
+  Object.keys(dynamicTree).forEach(dept => {
+    if (!merged[dept]) {
+      merged[dept] = dynamicTree[dept];
+      return;
+    }
+    // Shallow copy next level
+    merged[dept] = { ...merged[dept] };
+
+    Object.keys(dynamicTree[dept]).forEach(year => {
+      if (!merged[dept][year]) {
+        merged[dept][year] = dynamicTree[dept][year];
+        return;
+      }
+      merged[dept][year] = { ...merged[dept][year] };
+
+      Object.keys(dynamicTree[dept][year]).forEach(sec => {
+        if (!merged[dept][year][sec]) {
+          merged[dept][year][sec] = dynamicTree[dept][year][sec];
+          return;
+        }
+        merged[dept][year][sec] = { ...merged[dept][year][sec] };
+
+        Object.keys(dynamicTree[dept][year][sec]).forEach(subj => {
+          if (!merged[dept][year][sec][subj]) {
+            merged[dept][year][sec][subj] = dynamicTree[dept][year][sec][subj];
+            return;
+          }
+
+          // Merge arrays
+          merged[dept][year][sec][subj] = [
+            ...merged[dept][year][sec][subj],
+            ...dynamicTree[dept][year][sec][subj]
+          ];
+
+          // Sort by order
+          merged[dept][year][sec][subj].sort(
+            (a, b) => (a.meta?.order ?? 999) - (b.meta?.order ?? 999)
+          );
+        });
+      });
+    });
+  });
+
+  return merged;
+};
