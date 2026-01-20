@@ -53,6 +53,7 @@ const PageWrapper = ({ noteData, dept, year, section, subj }) => {
   const isSuperAdmin = noteData.uploadedByEmail === 'sankaranarayanan5.ssv@gmail.com' || noteData.uploadedByEmail === 'shankar';
   const displayUploaderName = isSuperAdmin || !isDynamic ? 'Shankar' : (noteData.uploadedByName || 'Shankar');
   const displayUploaderEmail = isSuperAdmin || !isDynamic ? 'shankar@smvec.ac.in' : (noteData.uploadedByEmail || 'shankar@smvec.ac.in');
+  const shouldShowAuthor = displayUploaderName.replace(/[^a-zA-Z0-9]/g, '').toLowerCase() !== 'shankar';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -179,8 +180,12 @@ const PageWrapper = ({ noteData, dept, year, section, subj }) => {
       <div className="pdf-only mb-10 pb-8 border-b-2 border-gray-100">
         <h1 className="text-4xl font-black text-black mb-2">{meta.title}</h1>
         <div className="flex items-center gap-4 text-xs font-bold text-gray-500 uppercase tracking-widest">
-          <span>{displayUploaderName}</span>
-          <span className="w-1 h-1 rounded-full bg-gray-300"></span>
+          {shouldShowAuthor && (
+            <>
+              <span>{displayUploaderName}</span>
+              <span className="w-1 h-1 rounded-full bg-gray-300"></span>
+            </>
+          )}
           <span>{dept}</span>
           <span className="w-1 h-1 rounded-full bg-gray-300"></span>
           <span>{subj}</span>
@@ -198,14 +203,16 @@ const PageWrapper = ({ noteData, dept, year, section, subj }) => {
                 {meta.title}
               </h1>
 
-              <div className="flex items-center gap-5 pt-4">
-                <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center font-black text-xl border border-white/20">
-                  {displayUploaderName[0]}
+              {shouldShowAuthor && (
+                <div className="flex items-center gap-5 pt-4">
+                  <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center font-black text-xl border border-white/20">
+                    {displayUploaderName[0]}
+                  </div>
+                  <div>
+                    <p className="font-extrabold text-lg tracking-tight">{displayUploaderName}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-extrabold text-lg tracking-tight">{displayUploaderName}</p>
-                </div>
-              </div>
+              )}
             </div>
 
             <div className="flex flex-col items-end gap-5">
